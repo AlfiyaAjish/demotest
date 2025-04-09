@@ -37,6 +37,25 @@ def list_containers():
     except Exception as e:
         handle_exception(e, "Failed to list containers")
 
+# Stop a running container
+def stop_container(name: str):
+    try:
+        container = client.containers.get(name)
+        container.stop()
+        return {"message": f"Container '{name}' stopped successfully."}
+    except Exception as e:
+        handle_exception(e, f"Failed to stop container '{name}'")
+
+# Start a stopped container
+def start_container(name: str):
+    try:
+        container = client.containers.get(name)
+        container.start()
+        return {"message": f"Container '{name}' started successfully."}
+    except Exception as e:
+        handle_exception(e, f"Failed to start container '{name}'")
+
+
 def get_logs(container_name: str):
     try:
         container = client.containers.get(container_name)

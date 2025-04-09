@@ -25,6 +25,15 @@ def run_container(data: ContainerRunRequest):
 def list_containers():
     return docker_service.list_containers()
 
+@router.post("/containers/{name}/stop")
+def stop_container(name: str):
+    return docker_service.stop_container(name)
+
+@router.post("/containers/{name}/start")
+def start_container(name: str):
+    return docker_service.start_container(name)
+
+
 @router.get("/containers/{name}/logs")
 def get_logs(name: str):
     return docker_service.get_logs(name)
