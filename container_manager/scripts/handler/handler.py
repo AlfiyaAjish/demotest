@@ -49,10 +49,6 @@ def get_logs(name: str):
 def delete_container(name: str):
     return docker_service.delete_container(name)
 
-@router.post("/volumes")
-def create_volume(data: VolumeCreateRequest):
-    return docker_service.create_volume(data.name)
-
 @router.get("/volumes")
 def list_volumes():
     return docker_service.list_volumes()
