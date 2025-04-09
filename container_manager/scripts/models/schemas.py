@@ -10,6 +10,10 @@ class ContainerRunRequest(BaseModel):
     name: str
     host_port: Optional[int] = None
     container_port: Optional[int] = None
+    volume_name: Optional[str] = None
+    container_path: Optional[str] = None
+
+
 class VolumeCreateRequest(BaseModel):
     name: str
 

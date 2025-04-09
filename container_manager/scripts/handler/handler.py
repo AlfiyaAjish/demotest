@@ -12,14 +12,21 @@ def build_image(data: ImageBuildRequest):
 def list_images():
     return docker_service.list_images()
 
+@router.post("/volumes")
+def create_volume(data: VolumeCreateRequest):
+    return docker_service.create_volume(data.name)
+
 @router.post("/containers/run")
 def run_container(data: ContainerRunRequest):
     return docker_service.run_container(
         image=data.image,
         name=data.name,
         host_port=data.host_port,
-        container_port=data.container_port
+        container_port=data.container_port,
+        volume_name=data.volume_name,
+        container_path=data.container_path
     )
+
 
 @router.get("/containers")
 def list_containers():
