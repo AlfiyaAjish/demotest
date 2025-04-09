@@ -1,0 +1,45 @@
+from fastapi import APIRouter
+from scripts.models.schemas import *
+from scripts.services import docker_service
+
+router = APIRouter()
+
+@router.post("/images/build")
+def build_image(data: ImageBuildRequest):
+    return docker_service.build_image(data.dockerfile_path, data.tag)
+
+@router.get("/images")
+def list_images():
+    return docker_service.list_images()
+
+@router.post("/containers/run")
+def run_container(data: ContainerRunRequest):
+    return docker_service.run_container(data.image, data.name)
+
+@router.get("/containers")
+def list_containers():
+    return docker_service.list_containers()
+
+@router.get("/containers/{name}/logs")
+def get_logs(name: str):
+    return docker_service.get_logs(name)
+
+@router.delete("/containers/{name}")
+def delete_container(name: str):
+    return docker_service.delete_container(name)
+
+@router.post("/volumes")
+def create_volume(data: VolumeCreateRequest):
+    return docker_service.create_volume(data.name)
+
+@router.get("/volumes")
+def list_volumes():
+    return docker_service.list_volumes()
+
+@router.put("/volumes")
+def update_volume(data: VolumeUpdateRequest):
+    return docker_service.update_volume(data.name, data.labels)
+
+@router.delete("/volumes/{name}")
+def delete_volume(name: str):
+    return docker_service.delete_volume(name)
