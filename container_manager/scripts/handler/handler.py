@@ -14,7 +14,12 @@ def list_images():
 
 @router.post("/containers/run")
 def run_container(data: ContainerRunRequest):
-    return docker_service.run_container(data.image, data.name)
+    return docker_service.run_container(
+        image=data.image,
+        name=data.name,
+        host_port=data.host_port,
+        container_port=data.container_port
+    )
 
 @router.get("/containers")
 def list_containers():

@@ -17,12 +17,19 @@ def list_images():
     except Exception as e:
         handle_exception(e, "Failed to list images")
 
-def run_container(image: str, name: str):
+def run_container(image: str, name: str, host_port: int = None, container_port: int = None):
     try:
-        container = client.containers.run(image=image, name=name, detach=True)
+        ports = {f"{container_port}/tcp": host_port} if host_port and container_port else None
+        container = client.containers.run(
+            image=image,
+            name=name,
+            ports=ports,
+            detach=True
+        )
         return {"message": CONTAINER_START_SUCCESS.format(name=name)}
     except Exception as e:
         handle_exception(e, "Failed to run container")
+
 
 def list_containers():
     try:

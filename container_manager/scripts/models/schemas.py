@@ -8,7 +8,8 @@ class ImageBuildRequest(BaseModel):
 class ContainerRunRequest(BaseModel):
     image: str
     name: str
-
+    host_port: Optional[int] = None
+    container_port: Optional[int] = None
 class VolumeCreateRequest(BaseModel):
     name: str
 
