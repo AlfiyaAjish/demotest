@@ -12,10 +12,6 @@ def build_image(data: ImageBuildRequest):
 def list_images():
     return docker_service.list_images()
 
-@router.post("/volumes")
-def create_volume(data: VolumeCreateRequest):
-    return docker_service.create_volume(data.name)
-
 @router.post("/containers/run")
 def run_container(data: ContainerRunRequest):
     return docker_service.run_container(
@@ -48,6 +44,10 @@ def get_logs(name: str):
 @router.delete("/containers/{name}")
 def delete_container(name: str):
     return docker_service.delete_container(name)
+
+@router.post("/volumes")
+def create_volume(data: VolumeCreateRequest):
+    return docker_service.create_volume(data.name)
 
 @router.get("/volumes")
 def list_volumes():
