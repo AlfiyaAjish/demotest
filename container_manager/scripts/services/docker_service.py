@@ -1,8 +1,31 @@
 import docker
 from scripts.constants.constants import *
 from scripts.utils.response_handler import handle_exception
+from fastapi import HTTPException
+
 
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+
+from uuid import uuid4
+
+logged_in_token = None  # In-memory token to simulate login state
+
+def docker_login(username: str, password: str):
+    global logged_in_token
+    try:
+        client.login(username=username, password=password)
+        logged_in_token = str(uuid4())  # Generate session token
+        return {"message": "Login successful", "token": logged_in_token}
+    except Exception as e:
+        handle_exception(e, "Login failed")
+
+def docker_logout():
+    global logged_in_token
+    logged_in_token = None
+    return {"message": "Logged out successfully"}
+
+def is_logged_in(token: str):
+    return token == logged_in_token
 
 def build_image(path: str, tag: str):
     try:
@@ -109,3 +132,28 @@ def delete_volume(name: str):
         return {"message": VOLUME_DELETE_SUCCESS.format(name=name)}
     except Exception as e:
         handle_exception(e, "Failed to delete volume")
+
+
+def push_image(local_tag: str, remote_repo: str, token: str):
+    if not is_logged_in(token):
+        raise HTTPException(status_code=401, detail="Unauthorized: Login required")
+
+    try:
+        image = client.images.get(local_tag)
+        image.tag(remote_repo)
+        result = client.images.push(remote_repo)
+        return {"message": f"Pushed to {remote_repo}", "result": result}
+    except Exception as e:
+        handle_exception(e, f"Failed to push image '{local_tag}'")
+
+
+def pull_image(repository: str, token: str):
+    if not is_logged_in(token):
+        raise HTTPException(status_code=401, detail="Unauthorized: Login required")
+
+    try:
+        image = client.images.pull(repository)
+        return {"message": f"Pulled {repository}", "tags": image.tags}
+    except Exception as e:
+        handle_exception(e, f"Failed to pull image '{repository}'")
+

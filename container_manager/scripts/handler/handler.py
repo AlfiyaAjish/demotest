@@ -142,3 +142,21 @@ def update_volume(data: VolumeUpdateRequest):
 @volume_router.delete("/{name}")
 def delete_volume(name: str):
     return docker_service.delete_volume(name)
+
+from fastapi import Body
+
+@router.post("/docker-login")
+def docker_login(username: str = Body(...), password: str = Body(...)):
+    return docker_service.docker_login(username, password)
+
+@router.post("/docker-logout")
+def docker_logout():
+    return docker_service.docker_logout()
+
+@router.post("/docker-images/push")
+def push_image(local_tag: str, remote_repo: str, token: str):
+    return docker_service.push_image(local_tag, remote_repo, token)
+
+@router.post("/docker-images/pull")
+def pull_image(repository: str, token: str):
+    return docker_service.pull_image(repository, token)
