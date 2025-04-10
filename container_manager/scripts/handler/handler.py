@@ -68,6 +68,7 @@ from scripts.services import docker_service
 from scripts.models.schemas import *
 
 # Routers grouped by topic
+router=APIRouter()
 image_router = APIRouter(prefix="/docker-images", tags=["Docker Images"])
 container_router = APIRouter(prefix="/docker-containers", tags=["Docker Containers"])
 volume_router = APIRouter(prefix="/docker-volumes", tags=["Docker Volumes"])
