@@ -152,3 +152,10 @@ def dockerhub_login(username: str, password: str):
     except Exception as e:
         handle_exception(e, "DockerHub login failed")
 
+
+def delete_image(image_name: str):
+    try:
+        client.images.remove(image=image_name, force=True)
+        return {"message": f"Image '{image_name}' deleted successfully."}
+    except Exception as e:
+        handle_exception(e, f"Failed to delete image '{image_name}'")

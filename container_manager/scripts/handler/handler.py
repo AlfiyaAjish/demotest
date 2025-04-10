@@ -161,5 +161,9 @@ def push_image(request: ImagePushRequest):
 def pull_image(request: ImagePullRequest):
     return docker_service.pull_image(request.repository)
 
+@image_router.delete("/{image_name}")
+def delete_image(image_name: str):
+    return docker_service.delete_image(image_name)
+
 
 
