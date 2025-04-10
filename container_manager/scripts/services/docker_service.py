@@ -125,15 +125,22 @@ def push_image(local_tag: str, remote_repo: str):
     except Exception as e:
         handle_exception(e, f"Failed to push image '{local_tag}'")
 
-def pull_image(repository: str):
+def pull_image(repository: str, local_tag: str = None):
     if not docker_logged_in:
         raise HTTPException(status_code=401, detail="Unauthorized: Please login to DockerHub first")
 
     try:
         image = client.images.pull(repository)
-        return {"message": f"Pulled {repository}", "tags": image.tags}
+        if local_tag:
+            image.tag(local_tag)
+        return {
+            "message": f"Pulled {repository}",
+            "tags": image.tags,
+            "retagged_as": local_tag if local_tag else "Not retagged"
+        }
     except Exception as e:
         handle_exception(e, f"Failed to pull image '{repository}'")
+
 
 
 def is_logged_in(token: str) -> bool:

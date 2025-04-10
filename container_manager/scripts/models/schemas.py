@@ -31,5 +31,5 @@ class ImagePushRequest(BaseModel):
     remote_repo: str
 
 class ImagePullRequest(BaseModel):
-    repository: str
-
+    repository: str  # Full repo like alfiya2821/myapp:v1
+    local_tag: str = None  # Optional: tag it locally as "image1"
