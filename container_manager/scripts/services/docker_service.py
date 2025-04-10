@@ -126,20 +126,28 @@ def push_image(local_tag: str, remote_repo: str):
         handle_exception(e, f"Failed to push image '{local_tag}'")
 
 def pull_image(repository: str, local_tag: str = None):
-    if not docker_logged_in:
-        raise HTTPException(status_code=401, detail="Unauthorized: Please login to DockerHub first")
-
     try:
+        # Attempt to pull without requiring login (works for public images)
         image = client.images.pull(repository)
         if local_tag:
             image.tag(local_tag)
+
         return {
             "message": f"Pulled {repository}",
             "tags": image.tags,
             "retagged_as": local_tag if local_tag else "Not retagged"
         }
-    except Exception as e:
+
+    except docker.errors.APIError as e:
+        # Catch unauthorized access — means it's a private repo
+        if "unauthorized" in str(e).lower() or "authentication required" in str(e).lower():
+            raise HTTPException(
+                status_code=401,
+                detail="Private repository: Please login to DockerHub first using /docker-images/login"
+            )
+        # Other errors
         handle_exception(e, f"Failed to pull image '{repository}'")
+
 
 
 
