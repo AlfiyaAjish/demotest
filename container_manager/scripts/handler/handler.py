@@ -85,6 +85,10 @@ def build_image(data: ImageBuildRequest):
 def list_images():
     return docker_service.list_images()
 
+@image_router.post("/{name}/stop")
+def stop_container(name: str):
+    return docker_service.stop_container(name)
+
 # ─────────────────────────────
 # Docker Container Endpoints
 # ─────────────────────────────
