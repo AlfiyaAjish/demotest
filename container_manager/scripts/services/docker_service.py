@@ -113,9 +113,9 @@ def delete_volume(name: str):
         handle_exception(e, "Failed to delete volume")
 
 
-def push_image(local_tag: str, remote_repo: str, token: str):
-    if not is_logged_in(token):
-        raise HTTPException(status_code=401, detail="Unauthorized: Login required")
+def push_image(local_tag: str, remote_repo: str):
+    if not docker_logged_in:
+        raise HTTPException(status_code=401, detail="Unauthorized: Please login to DockerHub first")
 
     try:
         image = client.images.get(local_tag)
@@ -125,10 +125,9 @@ def push_image(local_tag: str, remote_repo: str, token: str):
     except Exception as e:
         handle_exception(e, f"Failed to push image '{local_tag}'")
 
-
-def pull_image(repository: str, token: str):
-    if not is_logged_in(token):
-        raise HTTPException(status_code=401, detail="Unauthorized: Login required")
+def pull_image(repository: str):
+    if not docker_logged_in:
+        raise HTTPException(status_code=401, detail="Unauthorized: Please login to DockerHub first")
 
     try:
         image = client.images.pull(repository)
@@ -136,7 +135,20 @@ def pull_image(repository: str, token: str):
     except Exception as e:
         handle_exception(e, f"Failed to pull image '{repository}'")
 
+
 def is_logged_in(token: str) -> bool:
     # You should verify this token properly (e.g., DockerHub OAuth, JWT, or custom logic)
     return bool(token)  # simplistic version
+# ─── Global variable to track login state ──────────────
+
+
+docker_logged_in = False
+def dockerhub_login(username: str, password: str):
+    global docker_logged_in
+    try:
+        client.login(username=username, password=password)
+        docker_logged_in = True
+        return {"message": f"DockerHub login successful as '{username}'."}
+    except Exception as e:
+        handle_exception(e, "DockerHub login failed")
 

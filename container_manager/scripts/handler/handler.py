@@ -77,6 +77,7 @@ volume_router = APIRouter(prefix="/docker-volumes", tags=["Docker Volumes"])
 # Docker Image Endpoints
 # ─────────────────────────────
 
+
 @image_router.post("/build")
 def build_image(data: ImageBuildRequest):
     return docker_service.build_image(data.dockerfile_path, data.tag)
@@ -85,9 +86,6 @@ def build_image(data: ImageBuildRequest):
 def list_images():
     return docker_service.list_images()
 
-@image_router.post("/{name}/stop")
-def stop_container(name: str):
-    return docker_service.stop_container(name)
 
 # ─────────────────────────────
 # Docker Container Endpoints
@@ -149,6 +147,10 @@ def delete_volume(name: str):
     return docker_service.delete_volume(name)
 
 from fastapi import Header
+
+@image_router.post("/login")
+def dockerhub_login_view(data: DockerLoginRequest):
+    return docker_service.dockerhub_login(data.username, data.password)
 
 @image_router.post("/push")
 def push_image(request: ImagePushRequest, token: str = Header(...)):

@@ -22,6 +22,10 @@ class VolumeUpdateRequest(BaseModel):
     labels: Dict[str, str]
 
 
+class DockerLoginRequest(BaseModel):
+    username: str
+    password: str
+
 class ImagePushRequest(BaseModel):
     local_tag: str
     remote_repo: str
