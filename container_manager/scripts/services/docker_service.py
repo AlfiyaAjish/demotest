@@ -5,7 +5,7 @@ from fastapi import HTTPException
 
 
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-
+clients = docker.from_env()
 from uuid import uuid4
 
 logged_in_token = None  # In-memory token to simulate login state
@@ -13,7 +13,7 @@ logged_in_token = None  # In-memory token to simulate login state
 def docker_login(username: str, password: str):
     global logged_in_token
     try:
-        client.login(username=username, password=password)
+        clients.login(username=username, password=password)
         logged_in_token = str(uuid4())  # Generate session token
         return {"message": "Login successful", "token": logged_in_token}
     except Exception as e:
