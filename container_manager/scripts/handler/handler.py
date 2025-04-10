@@ -144,5 +144,19 @@ def update_volume(data: VolumeUpdateRequest):
 def delete_volume(name: str):
     return docker_service.delete_volume(name)
 
+@image_router.post("/login")
+def docker_login(username: str = Body(...), password: str = Body(...)):
+    return docker_service.docker_login(username, password)
 
+@image_router.post("/logout")
+def docker_logout():
+    return docker_service.docker_logout()
+
+@image_router.post("/push")
+def push_image(local_tag: str, remote_repo: str, token: str):
+    return docker_service.push_image(local_tag, remote_repo, token)
+
+@image_router.post("/pull")
+def pull_image(repository: str, token: str):
+    return docker_service.pull_image(repository, token)
 
