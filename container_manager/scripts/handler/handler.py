@@ -69,7 +69,6 @@ from scripts.models.schemas import *
 from fastapi import Body
 
 # Routers grouped by topic
-auth_router = APIRouter(prefix="/docker-auth", tags=["Docker Auth"])
 image_router = APIRouter(prefix="/docker-images", tags=["Docker Images"])
 container_router = APIRouter(prefix="/docker-containers", tags=["Docker Containers"])
 volume_router = APIRouter(prefix="/docker-volumes", tags=["Docker Volumes"])
@@ -147,19 +146,19 @@ def delete_volume(name: str):
 
 
 
-@auth_router.post("/login", tags=["Docker Auth"])
+@image_router.post("/login")
 def docker_login(username: str = Body(...), password: str = Body(...)):
     return docker_service.docker_login(username, password)
 
-@auth_router.post("/logout", tags=["Docker Auth"])
+@image_router.post("/logout")
 def docker_logout():
     return docker_service.docker_logout()
 
-@auth_router.post("/push", tags=["Docker Auth"])
+@image_router.post("/push")
 def push_image(local_tag: str, remote_repo: str, token: str):
     return docker_service.push_image(local_tag, remote_repo, token)
 
-@auth_router.post("/pull", tags=["Docker Auth"])
+@image_router.post("/pull")
 def pull_image(repository: str, token: str):
     return docker_service.pull_image(repository, token)
 
