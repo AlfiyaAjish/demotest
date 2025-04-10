@@ -146,35 +146,19 @@ def delete_volume(name: str):
 
 from fastapi import Body
 
-@auth_router.post("/login")
+@auth_router.post("/login", tags=["Docker Auth"])
 def docker_login(username: str = Body(...), password: str = Body(...)):
     return docker_service.docker_login(username, password)
 
-@auth_router.post("/logout")
+@auth_router.post("/logout", tags=["Docker Auth"])
 def docker_logout():
     return docker_service.docker_logout()
 
-@auth_router.post("/push")
+@auth_router.post("/push", tags=["Docker Auth"])
 def push_image(local_tag: str, remote_repo: str, token: str):
     return docker_service.push_image(local_tag, remote_repo, token)
 
-@auth_router.post("/pull")
+@auth_router.post("/pull", tags=["Docker Auth"])
 def pull_image(repository: str, token: str):
     return docker_service.pull_image(repository, token)
 
-#
-# @router.post("/docker-login")
-# def docker_login(username: str = Body(...), password: str = Body(...)):
-#     return docker_service.docker_login(username, password)
-#
-# @router.post("/docker-logout")
-# def docker_logout():
-#     return docker_service.docker_logout()
-#
-# @router.post("/docker-images/push")
-# def push_image(local_tag: str, remote_repo: str, token: str):
-#     return docker_service.push_image(local_tag, remote_repo, token)
-#
-# @router.post("/docker-images/pull")
-# def pull_image(repository: str, token: str):
-#     return docker_service.pull_image(repository, token)
