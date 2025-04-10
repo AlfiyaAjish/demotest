@@ -153,11 +153,13 @@ def dockerhub_login_view(data: DockerLoginRequest):
     return docker_service.dockerhub_login(data.username, data.password)
 
 @image_router.post("/push")
-def push_image(request: ImagePushRequest, token: str = Header(...)):
-    return docker_service.push_image(request.local_tag, request.remote_repo, token)
+def push_image(request: ImagePushRequest):
+    return docker_service.push_image(request.local_tag, request.remote_repo)
+
 
 @image_router.post("/pull")
-def pull_image(request: ImagePullRequest, token: str = Header(...)):
-    return docker_service.pull_image(request.repository, token)
+def pull_image(request: ImagePullRequest):
+    return docker_service.pull_image(request.repository)
+
 
 
