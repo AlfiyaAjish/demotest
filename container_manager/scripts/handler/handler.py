@@ -162,9 +162,12 @@ def pull_image(request: ImagePullRequest):
     return docker_service.pull_image(request.repository, request.local_tag)
 
 
-@image_router.delete("/{image_name}")
-def delete_image(image_name: str):
+from fastapi import Query
+
+@image_router.delete("")
+def delete_image(image_name: str = Query(..., description="Full image name with optional tag")):
     return docker_service.delete_image(image_name)
+
 
 
 
