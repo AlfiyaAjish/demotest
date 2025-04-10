@@ -5,27 +5,6 @@ from fastapi import HTTPException
 
 
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
-clients = docker.from_env()
-from uuid import uuid4
-
-logged_in_token = None  # In-memory token to simulate login state
-
-def docker_login(username: str, password: str):
-    global logged_in_token
-    try:
-        clients.login(username=username, password=password)
-        logged_in_token = str(uuid4())  # Generate session token
-        return {"message": "Login successful", "token": logged_in_token}
-    except Exception as e:
-        handle_exception(e, "Login failed")
-
-def docker_logout():
-    global logged_in_token
-    logged_in_token = None
-    return {"message": "Logged out successfully"}
-
-def is_logged_in(token: str):
-    return token == logged_in_token
 
 def build_image(path: str, tag: str):
     try:
@@ -156,4 +135,8 @@ def pull_image(repository: str, token: str):
         return {"message": f"Pulled {repository}", "tags": image.tags}
     except Exception as e:
         handle_exception(e, f"Failed to pull image '{repository}'")
+
+def is_logged_in(token: str) -> bool:
+    # You should verify this token properly (e.g., DockerHub OAuth, JWT, or custom logic)
+    return bool(token)  # simplistic version
 

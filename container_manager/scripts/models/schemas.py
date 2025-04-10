@@ -20,3 +20,12 @@ class VolumeCreateRequest(BaseModel):
 class VolumeUpdateRequest(BaseModel):
     name: str
     labels: Dict[str, str]
+
+
+class ImagePushRequest(BaseModel):
+    local_tag: str
+    remote_repo: str
+
+class ImagePullRequest(BaseModel):
+    repository: str
+
