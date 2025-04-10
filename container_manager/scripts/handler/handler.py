@@ -66,6 +66,7 @@
 from fastapi import APIRouter
 from scripts.services import docker_service
 from scripts.models.schemas import *
+from fastapi import Body
 
 # Routers grouped by topic
 auth_router = APIRouter(prefix="/docker-auth", tags=["Docker Auth"])
@@ -144,7 +145,7 @@ def update_volume(data: VolumeUpdateRequest):
 def delete_volume(name: str):
     return docker_service.delete_volume(name)
 
-from fastapi import Body
+
 
 @auth_router.post("/login", tags=["Docker Auth"])
 def docker_login(username: str = Body(...), password: str = Body(...)):
