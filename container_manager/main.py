@@ -7,11 +7,11 @@
 
 
 from fastapi import FastAPI
-from scripts.handler.handler import image_router, container_router, volume_router,router
+from scripts.handler.handler import image_router, container_router, volume_router,auth_router
 
 app = FastAPI(title="Docker Container Manager")
 
 app.include_router(image_router)
 app.include_router(container_router)
 app.include_router(volume_router)
-app.include_router(router)
+app.include_router(auth_router)

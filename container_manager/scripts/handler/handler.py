@@ -68,7 +68,7 @@ from scripts.services import docker_service
 from scripts.models.schemas import *
 
 # Routers grouped by topic
-router=APIRouter()
+auth_router = APIRouter(prefix="/docker-auth", tags=["Docker Auth"])
 image_router = APIRouter(prefix="/docker-images", tags=["Docker Images"])
 container_router = APIRouter(prefix="/docker-containers", tags=["Docker Containers"])
 volume_router = APIRouter(prefix="/docker-volumes", tags=["Docker Volumes"])
@@ -146,18 +146,35 @@ def delete_volume(name: str):
 
 from fastapi import Body
 
-@router.post("/docker-login")
+@auth_router.post("/login")
 def docker_login(username: str = Body(...), password: str = Body(...)):
     return docker_service.docker_login(username, password)
 
-@router.post("/docker-logout")
+@auth_router.post("/logout")
 def docker_logout():
     return docker_service.docker_logout()
 
-@router.post("/docker-images/push")
+@auth_router.post("/push")
 def push_image(local_tag: str, remote_repo: str, token: str):
     return docker_service.push_image(local_tag, remote_repo, token)
 
-@router.post("/docker-images/pull")
+@auth_router.post("/pull")
 def pull_image(repository: str, token: str):
     return docker_service.pull_image(repository, token)
+
+#
+# @router.post("/docker-login")
+# def docker_login(username: str = Body(...), password: str = Body(...)):
+#     return docker_service.docker_login(username, password)
+#
+# @router.post("/docker-logout")
+# def docker_logout():
+#     return docker_service.docker_logout()
+#
+# @router.post("/docker-images/push")
+# def push_image(local_tag: str, remote_repo: str, token: str):
+#     return docker_service.push_image(local_tag, remote_repo, token)
+#
+# @router.post("/docker-images/pull")
+# def pull_image(repository: str, token: str):
+#     return docker_service.pull_image(repository, token)
