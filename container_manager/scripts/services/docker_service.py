@@ -2,60 +2,129 @@ import docker
 from scripts.constants.constants import *
 from scripts.utils.response_handler import handle_exception
 from fastapi import HTTPException
-
+from scripts.models.schemas import *
 
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
-def build_image(path: str, tag: str):
-    try:
-        image, _ = client.images.build(path=path, tag=tag)
-        return {"message": IMAGE_BUILD_SUCCESS.format(tag=tag)}
-    except Exception as e:
-        handle_exception(e, "Failed to build image")
+# def build_image(path: str, tag: str):
+#     try:
+#         image, _ = client.images.build(path=path, tag=tag)
+#         return {"message": IMAGE_BUILD_SUCCESS.format(tag=tag)}
+#     except Exception as e:
+#         handle_exception(e, "Failed to build image")
 
-def list_images():
+def build_image_kwargs(data:ImageBuildRequest):
     try:
-        return [img.tags for img in client.images.list()]
+        build_args = data.dict(exclude_unset=True)
+        image, _ = client.images.build(**build_args)
+        return {"message": IMAGE_BUILD_SUCCESS.format(tag=build_args.get("tag", "<no tag>"))}
     except Exception as e:
-        handle_exception(e, "Failed to list images")
+        handle_exception(e, "Failed to build image with extended args")
 
-def run_container(
-    image: str,
-    name: str,
-    host_port: int = None,
-    container_port: int = None,
-    volume_name: str = None,
-    container_path: str = None
-):
+
+# def list_images():
+#     try:
+#         return [img.tags for img in client.images.list()]
+#     except Exception as e:
+#         handle_exception(e, "Failed to list images")
+
+def list_images_with_filters(name: str = None, all: bool = False, filters: Dict[str, Any] = None):
     try:
-        ports = {f"{container_port}/tcp": host_port} if host_port and container_port else None
-        volumes = {volume_name: {'bind': container_path, 'mode': 'rw'}} if volume_name and container_path else None
+        kwargs = {}
+        if name is not None:
+            kwargs["name"] = name
+        if all:
+            kwargs["all"] = True
+        if filters is not None:
+            kwargs["filters"] = filters
 
-        container = client.containers.run(
-            image=image,
-            name=name,
-            ports=ports,
-            volumes=volumes,
-            detach=True
-        )
-        return {"message": f"Container '{name}' started successfully."}
+        images = client.images.list(**kwargs)
+        return [{"id": img.id, "tags": img.tags} for img in images]
     except Exception as e:
-        handle_exception(e, "Failed to run container")
+        handle_exception(e, "Failed to list images with filters")
 
-def list_containers():
+
+# def run_container(
+#     image: str,
+#     name: str,
+#     host_port: int = None,
+#     container_port: int = None,
+#     volume_name: str = None,
+#     container_path: str = None
+# ):
+#     try:
+#         ports = {f"{container_port}/tcp": host_port} if host_port and container_port else None
+#         volumes = {volume_name: {'bind': container_path, 'mode': 'rw'}} if volume_name and container_path else None
+#
+#         container = client.containers.run(
+#             image=image,
+#             name=name,
+#             ports=ports,
+#             volumes=volumes,
+#             detach=True
+#         )
+#         return {"message": f"Container '{name}' started successfully."}
+#     except Exception as e:
+#         handle_exception(e, "Failed to run container")
+
+def run_container_advanced(data: ContainerRunAdvancedRequest):
     try:
-        return [{"name": c.name, "image": c.image.tags, "status": c.status} for c in client.containers.list(all=True)]
+        kwargs = data.dict(exclude_unset=True)
+        image = kwargs.pop("image")
+        command = kwargs.pop("command", None)
+
+        container = client.containers.run(image=image, command=command, **kwargs)
+
+        return {
+            "message": f"Container '{container.name}' started successfully.",
+            "id": container.id,
+            "status": container.status
+        }
     except Exception as e:
-        handle_exception(e, "Failed to list containers")
+        handle_exception(e, "Failed to run container with advanced parameters")
+#
+#
+# def list_containers():
+#     try:
+#         return [{"name": c.name, "image": c.image.tags, "status": c.status} for c in client.containers.list(all=True)]
+#     except Exception as e:
+#         handle_exception(e, "Failed to list containers")
+
+def list_containers_with_filters(params: ContainerListRequest):
+    try:
+        kwargs = params.dict(exclude_unset=True)
+        containers = client.containers.list(**kwargs)
+
+        return [
+            {
+                "name": c.name,
+                "id": c.id,
+                "image": c.image.tags,
+                "status": c.status
+            } for c in containers
+        ]
+    except Exception as e:
+        handle_exception(e, "Failed to list containers with filters")
+
 
 # Stop a running container
-def stop_container(name: str):
+# def stop_container(name: str):
+#     try:
+#         container = client.containers.get(name)
+#         container.stop()
+#         return {"message": f"Container '{name}' stopped successfully."}
+#     except Exception as e:
+#         handle_exception(e, f"Failed to stop container '{name}'")
+
+def stop_container(name: str, timeout: float = None):
     try:
         container = client.containers.get(name)
-        container.stop()
+        stop_args = {"timeout": timeout} if timeout is not None else {}
+        container.stop(**stop_args)
         return {"message": f"Container '{name}' stopped successfully."}
     except Exception as e:
         handle_exception(e, f"Failed to stop container '{name}'")
+
 
 # Start a stopped container
 def start_container(name: str):
@@ -67,50 +136,82 @@ def start_container(name: str):
         handle_exception(e, f"Failed to start container '{name}'")
 
 
-def get_logs(container_name: str):
+def get_logs_with_params(
+    name: str,
+    params: ContainerLogsRequest
+):
     try:
-        container = client.containers.get(container_name)
-        return {"logs": container.logs().decode()}
-    except Exception as e:
-        handle_exception(e, "Failed to get logs")
+        container = client.containers.get(name)
+        opts = params.dict(exclude_unset=True)
+        # Docker SDK expects stream=True only if follow=True
+        if opts.pop("follow", False):
+            return container.logs(stream=True, **opts)
 
-def delete_container(container_name: str):
-    try:
-        container = client.containers.get(container_name)
-        container.stop()
-        container.remove()
-        return {"message": CONTAINER_DELETE_SUCCESS.format(name=container_name)}
+        raw = container.logs(stream=False, **opts)
+        return {"logs": raw.decode(errors="ignore")}
     except Exception as e:
-        handle_exception(e, "Failed to delete container")
+        handle_exception(e, f"Failed to get logs for '{name}'")
 
-def create_volume(name: str):
+
+def remove_container_with_params(name: str, params: ContainerRemoveRequest):
     try:
-        client.volumes.create(name=name)
-        return {"message": VOLUME_CREATE_SUCCESS.format(name=name)}
+        container = client.containers.get(name)
+        opts = params.dict(exclude_unset=True)
+        container.remove(**opts)
+        return {"message": f"Container '{name}' removed successfully."}
     except Exception as e:
-        handle_exception(e, "Failed to create volume")
+        handle_exception(e, f"Failed to remove container '{name}'")
 
-def list_volumes():
+
+# def create_volume(name: str):
+#     try:
+#         client.volumes.create(name=name)
+#         return {"message": VOLUME_CREATE_SUCCESS.format(name=name)}
+#     except Exception as e:
+#         handle_exception(e, "Failed to create volume")
+#
+# def list_volumes():
+#     try:
+#         return [v.name for v in client.volumes.list()]
+#     except Exception as e:
+#         handle_exception(e, "Failed to list volumes")
+
+from scripts.models.schemas import VolumeCreateRequest
+
+def create_volume_with_params(data: VolumeCreateRequest):
     try:
-        return [v.name for v in client.volumes.list()]
+        opts = data.dict(exclude_unset=True)
+        # Docker SDK: client.volumes.create(name=None, driver=None, driver_opts=None, labels=None)
+        volume = client.volumes.create(**opts)
+        return {
+            "message": f"Volume '{volume.name}' created successfully.",
+            "name": volume.name,
+            "driver": volume.attrs.get("Driver"),
+            "labels": volume.attrs.get("Labels")
+        }
     except Exception as e:
-        handle_exception(e, "Failed to list volumes")
+        handle_exception(e, "Failed to create volume with parameters")
 
-def update_volume(name: str, labels: dict):
+#
+# def delete_volume(name: str):
+#     try:
+#         volume = client.volumes.get(name)
+#         volume.remove()
+#         return {"message": VOLUME_DELETE_SUCCESS.format(name=name)}
+#     except Exception as e:
+#         handle_exception(e, "Failed to delete volume")
+
+from scripts.models.schemas import VolumeRemoveRequest
+
+def remove_volume_with_params(name: str, params: VolumeRemoveRequest):
     try:
+        opts = params.dict(exclude_unset=True)
         volume = client.volumes.get(name)
-        volume.reload()
-        return {"message": f"Volume '{name}' updated (note: actual label update requires recreation)."}
+        volume.remove(**opts)
+        return {"message": f"Volume '{name}' removed successfully."}
     except Exception as e:
-        handle_exception(e, "Failed to update volume")
+        handle_exception(e, f"Failed to remove volume '{name}'")
 
-def delete_volume(name: str):
-    try:
-        volume = client.volumes.get(name)
-        volume.remove()
-        return {"message": VOLUME_DELETE_SUCCESS.format(name=name)}
-    except Exception as e:
-        handle_exception(e, "Failed to delete volume")
 
 
 def push_image(local_tag: str, remote_repo: str):
@@ -151,12 +252,6 @@ def pull_image(repository: str, local_tag: str = None):
 
 
 
-def is_logged_in(token: str) -> bool:
-    # You should verify this token properly (e.g., DockerHub OAuth, JWT, or custom logic)
-    return bool(token)  # simplistic version
-# ─── Global variable to track login state ──────────────
-
-
 docker_logged_in = False
 def dockerhub_login(username: str, password: str):
     global docker_logged_in
@@ -167,10 +262,20 @@ def dockerhub_login(username: str, password: str):
     except Exception as e:
         handle_exception(e, "DockerHub login failed")
 
+#
+# def delete_image(image_name: str):
+#     try:
+#         client.images.remove(image=image_name, force=True)
+#         return {"message": f"Image '{image_name}' deleted successfully."}
+#     except Exception as e:
+#         handle_exception(e, f"Failed to delete image '{image_name}'")
 
-def delete_image(image_name: str):
+
+
+def remove_image_with_params(image_name: str, params: ImageRemoveRequest):
     try:
-        client.images.remove(image=image_name, force=True)
-        return {"message": f"Image '{image_name}' deleted successfully."}
+        opts = params.dict(exclude_unset=True)
+        client.images.remove(image=image_name, **opts)
+        return {"message": f"Image '{image_name}' removed successfully.", "used_options": opts}
     except Exception as e:
-        handle_exception(e, f"Failed to delete image '{image_name}'")
+        handle_exception(e, f"Failed to remove image '{image_name}'")
