@@ -5,7 +5,7 @@ from typing import Optional, Dict
 #     dockerfile_path: str
 #     tag: str
 
-from pydantic import BaseModel
+from pydantic import BaseModel,ConfigDict
 from typing import Optional, Union, IO, Any, Dict, List,Tuple,Literal
 from io import StringIO
 from docker.types import Mount, Ulimit, EndpointConfig
@@ -37,6 +37,8 @@ class ImageBuildRequest(BaseModel):
     platform: Optional[str] = None
     isolation: Optional[str] = None
     use_config_proxy: Optional[bool] = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
 
 class ImageListRequest(BaseModel):
     name: Optional[str] = None
@@ -62,7 +64,6 @@ class ContainerRunAdvancedRequest(BaseModel):
     stdout: Optional[bool] = True
     stderr: Optional[bool] = False
     remove: Optional[bool] = False
-
     mac_address: Optional[str] = None
     mem_limit: Optional[Union[str, int]] = None
     mem_reservation: Optional[Union[str, int]] = None
@@ -104,7 +105,7 @@ class ContainerRunAdvancedRequest(BaseModel):
     volumes: Optional[Union[Dict[str, str], List[str]]] = None
     volumes_from: Optional[List[str]] = None
     working_dir: Optional[str] = None
-
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 class ContainerListRequest(BaseModel):
     all: Optional[bool] = False
