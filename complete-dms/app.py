@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from scripts.services.image_service import router as image_router
-from scripts.services.cont_service import container_router as cont_vol_router
-from scripts.services.vol_service import v as cont_vol_router
+from scripts.services.image_service import image_router as image_router
+from scripts.services.cont_service import container_router as cont_router
+from scripts.services.vol_sevice import volume_router as vol_router
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -20,8 +20,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(image_router, prefix="/docker_auth", tags=["Authentication"])
-    app.include_router(image_router, prefix="/image", tags=["Image Operations"])
-    app.include_router(cont_vol_router, prefix="/container_volume", tags=["Container & Volume Operations"])
+    app.include_router(image_router, prefix="/images", tags=["Image Operations"])
+    app.include_router(cont_router, prefix="/container", tags=["Container Operations"])
+    app.include_router(vol_router, prefix="/volume", tags=["  Volume Operations"])
 
     return app
