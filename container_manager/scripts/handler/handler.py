@@ -50,7 +50,8 @@ def list_images_advanced(filters: ImageListRequest = Body(...)):
 
 @container_router.post("/run-advanced")
 def run_container(request: ContainerRunAdvancedRequest):
-    clean_data = docker_service.clean_advanced_container_data(request)
+    raw_data = request.dict()
+    clean_data = docker_service.clean_advanced_container_data(raw_data)
     return docker_service.run_container_advanced(clean_data)
 
 # @container_router.post("/run")
