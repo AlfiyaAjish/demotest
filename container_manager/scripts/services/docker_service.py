@@ -13,21 +13,38 @@ client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 #     except Exception as e:
 #         handle_exception(e, "Failed to build image")
 
+import re
+from fastapi import HTTPException
+
+def is_valid_docker_tag(tag: str) -> bool:
+    # Docker tag validation pattern
+    return bool(re.match(r"^[a-z0-9][a-z0-9_.-]*(/[a-z0-9][a-z0-9_.-]*)*(?::[a-zA-Z0-9_.-]+)?$", tag))
+
 def build_image_kwargs(data: ImageBuildRequest):
     try:
         build_args = data.dict(exclude_unset=True)
 
+        # Ensure build context is provided
         if not build_args.get("path") and not build_args.get("fileobj"):
-            raise HTTPException(status_code=400, detail="Missing required 'path' or 'fileobj' for Docker build context.")
+            raise HTTPException(status_code=400, detail="Missing required 'path' or 'fileobj' for Docker build.")
 
+        # Validate the tag format
         tag = build_args.get("tag")
-        if tag and ":" not in tag:
-            tag += ":latest"  # Add default tag if not specified
+        if tag:
+            if not is_valid_docker_tag(tag):
+                raise HTTPException(status_code=400, detail=f"Invalid Docker image tag: '{tag}'")
+        else:
+            build_args["tag"] = "default:latest"  # Fallback tag if none provided
 
         image, _ = client.images.build(**build_args)
-        return {"message": IMAGE_BUILD_SUCCESS.format(tag=tag or "<no tag>")}
+
+        return {
+            "message": IMAGE_BUILD_SUCCESS.format(tag=build_args['tag']),
+            "id": image.id,
+            "tags": image.tags or ["<none>:<none>"]
+        }
+
     except Exception as e:
-        # Show full error for debugging
         raise HTTPException(status_code=500, detail=f"Docker build failed: {str(e)}")
 
 
