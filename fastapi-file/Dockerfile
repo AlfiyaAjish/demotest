@@ -15,5 +15,8 @@ EXPOSE 8000
 
 # Run FastAPI with Uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 48a746904b15dd029a085dddda7b5c476fe452a7

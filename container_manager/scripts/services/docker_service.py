@@ -13,13 +13,23 @@ client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 #     except Exception as e:
 #         handle_exception(e, "Failed to build image")
 
-def build_image_kwargs(data:ImageBuildRequest):
+ddef build_image_kwargs(data: ImageBuildRequest):
     try:
         build_args = data.dict(exclude_unset=True)
+
+        if not build_args.get("path") and not build_args.get("fileobj"):
+            raise HTTPException(status_code=400, detail="Missing required 'path' or 'fileobj' for Docker build context.")
+
+        tag = build_args.get("tag")
+        if tag and ":" not in tag:
+            tag += ":latest"  # Add default tag if not specified
+
         image, _ = client.images.build(**build_args)
-        return {"message": IMAGE_BUILD_SUCCESS.format(tag=build_args.get("tag", "<no tag>"))}
+        return {"message": IMAGE_BUILD_SUCCESS.format(tag=tag or "<no tag>")}
     except Exception as e:
-        handle_exception(e, "Failed to build image with extended args")
+        # Show full error for debugging
+        raise HTTPException(status_code=500, detail=f"Docker build failed: {str(e)}")
+
 
 
 # def list_images():
