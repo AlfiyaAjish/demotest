@@ -17,6 +17,7 @@ volume_router = APIRouter(prefix="/docker-volumes", tags=["Docker Volumes"])
 # def build_image(data: ImageBuildRequest):
 #     return docker_service.build_image(data.dockerfile_path, data.tag)
 
+
 @image_router.post("/build-advanced")
 def build_image_with_kwargs(data: ImageBuildRequest):
     return docker_service.build_image_kwargs(data)
@@ -41,10 +42,16 @@ def list_images_advanced(filters: ImageListRequest = Body(...)):
 # Docker Container Endpoints
 # ─────────────────────────────
 
-@container_router.post("/run-advanced")
-def run_container_advanced_view(data: ContainerRunAdvancedRequest):
-    return docker_service.run_container_advanced(data)
 
+
+# @container_router.post("/run-advanced")
+# def run_container_advanced_view(data: ContainerRunAdvancedRequest):
+#     return docker_service.run_container_advanced(data)
+
+@container_router.post("/run-advanced")
+def run_container(request: ContainerRunAdvancedRequest):
+    clean_data = docker_service.clean_advanced_container_data(request)
+    return docker_service.run_container_advanced(clean_data)
 
 # @container_router.post("/run")
 # def run_container(data: ContainerRunRequest):

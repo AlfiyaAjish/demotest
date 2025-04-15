@@ -14,7 +14,19 @@ client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 #         handle_exception(e, "Failed to build image")
 
 import re
-from fastapi import HTTPException
+
+def clean_advanced_container_data(data: ContainerRunAdvancedRequest):
+    """
+    Convert all fields with value "string" or empty string to None
+    """
+    cleaned_data = data.dict()
+    for key, value in cleaned_data.items():
+        if isinstance(value, str) and value.strip().lower() == "string":
+            cleaned_data[key] = None
+        if isinstance(value, str) and value.strip() == "":
+            cleaned_data[key] = None
+    return cleaned_data
+
 
 def is_valid_docker_tag(tag: str) -> bool:
     # Docker tag validation pattern
