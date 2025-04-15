@@ -22,7 +22,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(vol_router, prefix="/auth", tags=["Authentication Operations"])
+    app.include_router(auth_router, prefix="/auth", tags=["Authentication Operations"])
     app.include_router(image_router, prefix="/images", tags=["Image Operations"])
     app.include_router(cont_router, prefix="/container", tags=["Container Operations"])
     app.include_router(vol_router, prefix="/volume", tags=["Volume Operations"])
