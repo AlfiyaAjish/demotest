@@ -13,7 +13,7 @@ client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 #     except Exception as e:
 #         handle_exception(e, "Failed to build image")
 
-ddef build_image_kwargs(data: ImageBuildRequest):
+def build_image_kwargs(data: ImageBuildRequest):
     try:
         build_args = data.dict(exclude_unset=True)
 
