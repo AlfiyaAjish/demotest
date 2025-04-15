@@ -14,17 +14,7 @@ client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 #         handle_exception(e, "Failed to build image")
 
 import re
-def clean_advanced_container_data(data: dict):
-    """
-    Convert all fields with value "string" or empty string to None
-    """
-    cleaned_data = {}
-    for key, value in data.items():
-        if isinstance(value, str) and (value.strip().lower() == "string" or value.strip() == ""):
-            cleaned_data[key] = None
-        else:
-            cleaned_data[key] = value
-    return cleaned_data
+
 
 
 def is_valid_docker_tag(tag: str) -> bool:
