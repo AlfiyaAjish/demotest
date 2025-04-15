@@ -23,14 +23,4 @@ def delete_volume(
     logger.info(f"Deleting volume '{name}' with options: {params.dict(exclude_unset=True)}")
     return remove_volume_with_params(name, params)
 
-#
-# @volume_router.get(Endpoints.VOLUME_LIST)
-# def list_volumes_view():
-#     logger.info("Listing all Docker volumes")
-#     return list_volumes()
-#
-#
-# @volume_router.get(Endpoints.VOLUME_DETAILS)
-# def inspect_volume_view(name: str = Path(..., description="Name of the Docker volume")):
-#     logger.info(f"Inspecting volume '{name}'")
-#     return inspect_volume(name)
+

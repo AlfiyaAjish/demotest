@@ -77,6 +77,6 @@ class ContainerRemoveRequest(BaseModel):
 
 class ContainerLogsResponse(BaseModel):
     container_id: str = Field(..., title="Container ID", description="ID of the container")
-    logs: str = Field(..., title="Logs", description="Container logs output")
-
+    logs: List[str] = Field(..., title="Logs", description="Container logs output")
+    message: Optional[str] = Field(None, title="Message", description="Status message")
 
