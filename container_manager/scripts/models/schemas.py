@@ -1,9 +1,4 @@
-from pydantic import BaseModel
-from typing import Optional, Dict
 
-# class ImageBuildRequest(BaseModel):
-#     dockerfile_path: str
-#     tag: str
 
 from pydantic import BaseModel
 from typing import Optional, Union, IO, Any, Dict, List,Tuple,Literal
@@ -128,13 +123,9 @@ class ContainerLogsRequest(BaseModel):
 
 
 class ContainerRemoveRequest(BaseModel):
-    v: Optional[bool] = False       # Remove anonymous volumes associated with the container
-    link: Optional[bool] = False    # Remove the specified link
-    force: Optional[bool] = False   # Kill container if running & remove it
-
-
-
-
+    v: Optional[bool] = False
+    link: Optional[bool] = False
+    force: Optional[bool] = False
 
 class VolumeCreateRequest(BaseModel):
     name: Optional[str] = None
@@ -148,13 +139,13 @@ class VolumeCreateRequest(BaseModel):
 
 
 class VolumeRemoveRequest(BaseModel):
-    force: Optional[bool] = False  # If true, forcibly remove even if in use
+    force: Optional[bool] = False
 
 
 
 class ImageRemoveRequest(BaseModel):
-    force: Optional[bool] = False     # Force removal of running containers using the image
-    noprune: Optional[bool] = False   # Don’t delete untagged parent images
+    force: Optional[bool] = False
+    noprune: Optional[bool] = False
 
 
 class DockerLoginRequest(BaseModel):
@@ -166,5 +157,5 @@ class ImagePushRequest(BaseModel):
     remote_repo: str
 
 class ImagePullRequest(BaseModel):
-    repository: str  # Full repo like alfiya2821/myapp:v1
-    local_tag: str = None  # Optional: tag it locally as "image1"
+    repository: str
+    local_tag: str = None
