@@ -8,14 +8,8 @@ image_router = APIRouter(prefix="/docker-images", tags=["Docker Images"])
 container_router = APIRouter(prefix="/docker-containers", tags=["Docker Containers"])
 volume_router = APIRouter(prefix="/docker-volumes", tags=["Docker Volumes"])
 
-# ─────────────────────────────
 # Docker Image Endpoints
-# ─────────────────────────────
 
-
-# @image_router.post("/build")
-# def build_image(data: ImageBuildRequest):
-#     return docker_service.build_image(data.dockerfile_path, data.tag)
 
 
 @image_router.post("/build-advanced")
@@ -155,8 +149,6 @@ def push_image(request: ImagePushRequest):
 def pull_image(request: ImagePullRequest):
     return docker_service.pull_image(request.repository, request.local_tag)
 
-
-from scripts.models.schemas import ImageRemoveRequest
 
 @image_router.delete("")
 def delete_image(
