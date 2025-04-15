@@ -13,3 +13,4 @@ def signup(user: UserCreate):
 @authentication_router.post(Endpoints.AUTH_LOGIN)
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return login_user(form_data)
+
