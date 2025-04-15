@@ -4,7 +4,7 @@ from scripts.models.image_model import *
 from scripts.constants.api_endpoints import Endpoints
 from scripts.logging.logger import logger
 
-image_router = APIRouter(prefix="/docker-images", tags=["Docker Images"])
+image_router = APIRouter()
 
 
 @image_router.post(Endpoints.IMAGE_BUILD_ADV)

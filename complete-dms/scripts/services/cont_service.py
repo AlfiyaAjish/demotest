@@ -4,7 +4,7 @@ from scripts.models.cont_model import *
 from scripts.constants.api_endpoints import Endpoints
 from scripts.logging.logger import logger
 
-container_router = APIRouter(prefix="/docker-containers", tags=["Docker Containers"])
+container_router = APIRouter()
 
 @container_router.post(Endpoints.CONTAINER_RUN)
 def run_container(request: ContainerRunAdvancedRequest):

@@ -4,7 +4,7 @@ from scripts.models.volume_model import *
 from scripts.constants.api_endpoints import Endpoints
 from scripts.logging.logger import logger
 
-volume_router = APIRouter(prefix="/docker/volumes", tags=["Docker Volumes"])
+volume_router = APIRouter()
 
 
 @volume_router.post(Endpoints.VOLUME_CREATE)
