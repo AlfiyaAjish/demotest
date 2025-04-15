@@ -14,7 +14,7 @@ from datetime import datetime
 
 class ImageBuildRequest(BaseModel):
     path: Optional[str] = None
-    fileobj: Optional[Union[StringIO, IO[bytes]]] = None
+    fileobj: Optional[Any] = None
     tag: Optional[str] = None
     quiet: Optional[bool] = False
     nocache: Optional[bool] = False
@@ -69,12 +69,10 @@ class ContainerRunAdvancedRequest(BaseModel):
     mem_reservation: Optional[Union[str, int]] = None
     mem_swappiness: Optional[int] = None
     memswap_limit: Optional[Union[str, int]] = None
-    mounts: Optional[List[Mount]] = None
     nano_cpus: Optional[int] = None
     network: Optional[str] = None
     network_disabled: Optional[bool] = False
     network_mode: Optional[str] = None
-    networking_config: Optional[Dict[str, EndpointConfig]] = None
     oom_kill_disable: Optional[bool] = False
     oom_score_adj: Optional[int] = None
     pid_mode: Optional[str] = None
@@ -95,7 +93,6 @@ class ContainerRunAdvancedRequest(BaseModel):
     sysctls: Optional[Dict[str, Any]] = None
     tmpfs: Optional[Dict[str, str]] = None
     tty: Optional[bool] = False
-    ulimits: Optional[List[Ulimit]] = None
     use_config_proxy: Optional[bool] = None
     user: Optional[Union[str, int]] = None
     userns_mode: Optional[str] = None
