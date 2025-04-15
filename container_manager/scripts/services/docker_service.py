@@ -19,7 +19,7 @@ def clean_advanced_container_data(data: ContainerRunAdvancedRequest):
     """
     Convert all fields with value "string" or empty string to None
     """
-    cleaned_data = data.dict()
+    cleaned_data = {}
     for key, value in cleaned_data.items():
         if isinstance(value, str) and value.strip().lower() == "string":
             cleaned_data[key] = None
