@@ -57,9 +57,6 @@ def run_container(request: ContainerRunAdvancedRequest):
 def run_container_advanced_view(data: ContainerRunAdvancedRequest):
     return docker_service.run_container_advanced(data)
 
-# @container_router.get("")
-# def list_containers():
-#     return docker_service.list_containers()
 
 @container_router.post("/list")
 def list_containers_advanced(params: ContainerListRequest):

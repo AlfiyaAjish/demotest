@@ -94,7 +94,7 @@ class ContainerRunAdvancedRequest(BaseModel):
     uts_mode: Optional[str] = None
     version: Optional[str] = None
     volume_driver: Optional[str] = None
-    volumes: Optional[Union[Dict[str, str], List[str]]] = None
+    volumes: Optional[Dict[str, Dict[str, str]]] = None
     volumes_from: Optional[List[str]] = None
     working_dir: Optional[str] = None
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -102,7 +102,7 @@ class ContainerRunAdvancedRequest(BaseModel):
 class ContainerListRequest(BaseModel):
     all: Optional[bool] = False
     before: Optional[str] = None
-    filters: Optional[Any] = None  # Accepts dict or Docker-compatible filter format
+    filters: Optional[Any] = None
     limit: Optional[int] = -1
     since: Optional[str] = None
     sparse: Optional[bool] = False
@@ -131,9 +131,6 @@ class VolumeCreateRequest(BaseModel):
     driver_opts: Optional[Dict[str, Any]] = None
     labels: Optional[Dict[str, str]] = None
 
-
-# class VolumeCreateRequest(BaseModel):
-#     name: str
 
 
 class VolumeRemoveRequest(BaseModel):
