@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-file-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-file
+  template:
+    metadata:
+      labels:
+        app: fastapi-file
+    spec:
+      containers:
+        - name: fastapi-container
+          image: your-dockerhub-username/fastapi-file:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: uploads-volume
+              mountPath: /code/uploads
+            - name: db-volume
+              mountPath: /code/app_db
+            - name: config-volume
+              mountPath: /code/conf/application_conf.conf
+              subPath: application_conf.conf
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: database_url
+      volumes:
+        - name: uploads-volume
+          persistentVolumeClaim:
+            claimName: uploads-pvc
+        - name: db-volume
+          persistentVolumeClaim:
+            claimName: db-pvc
+        - name: config-volume
+          configMap:
+            name: app-config
